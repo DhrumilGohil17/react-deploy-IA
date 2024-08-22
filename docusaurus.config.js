@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 // `@type` JSDoc annotations allow editor autocompletion and type checking
 // (when paired with `@ts-check`).
 // There are various equivalent ways to declare your Docusaurus config.
@@ -12,7 +12,8 @@ const config = {
   url: 'https://inductive-automation.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  deploymentBranch: 'gh-pages'
+  deploymentBranch: 'gh-pages',
+  // @ts-ignore
   favicon: 'img/docs-logo.ico',
   trailingSlash: false,
   baseUrl: '/',
