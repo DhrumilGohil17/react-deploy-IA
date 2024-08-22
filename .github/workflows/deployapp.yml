@@ -1,0 +1,49 @@
+name: Deploy React App to EC2
+
+on:
+  push:
+    branches:
+      - main  # Adjust this if you want to deploy from a different branch
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'  # Match the node version in your package.json
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the React app
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifact
+        path: build/
+
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: build-artifact
+
+    - name: Deploy to EC2
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}  # Add your EC2 public IP or domain as a secret in GitHub
+        EC2_USER: ${{ secrets.EC2_USER }}  # Add your EC2 user (e.g., 'ec2-user') as a secret in GitHub
+        EC2_KEY: ${{ secrets.EC2_KEY }}    # Add your private key for SSH as a secret in GitHub
+      run: |
+        echo "${{ secrets.EC2_KEY }}" > ~/ec2-key.pem
+        chmod 600 ~/ec2-key.pem
+        scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/html/
+        ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart nginx'
+
