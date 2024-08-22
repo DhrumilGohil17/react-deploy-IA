@@ -42,7 +42,22 @@ jobs:
         EC2_USER: ${{ secrets.EC2_USER }}  # Add your EC2 user (e.g., 'ec2-user') as a secret in GitHub
         EC2_KEY: ${{ secrets.EC2_KEY }}    # Add your private key for SSH as a secret in GitHub
       run: |
-        echo "${{ secrets.EC2_KEY }}" > ~/ec2-key.pem
-        chmod 600 ~/ec2-key.pem
-        scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/
-        ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo cp -r /tmp/* /var/www/html/ && sudo systemctl restart nginx'
+          echo "${{ secrets.EC2_KEY }}" > ~/ec2-key.pem
+          chmod 600 ~/ec2-key.pem
+
+          # Transfer build artifacts and SSH key to bastion host
+          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/
+          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/
+
+          # SSH into bastion host and transfer to private instance
+          ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            scp -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem -r /tmp/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}:/tmp/
+            ssh -o StrictHostKeyChecking=no -i /tmp/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
+              sudo cp -r /tmp/* /var/www/html/
+              sudo systemctl restart nginx
+            INNER_EOF
+            rm -f /tmp/ec2-key.pem
+          EOF
+
+          # Cleanup the private key from the bastion host
+          ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'rm -f /tmp/ec2-key.pem'
