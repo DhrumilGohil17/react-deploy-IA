@@ -1,0 +1,100 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  font-family: proxima-nova, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  --ifm-color-h1: #445c6d;
+  --ifm-color-primary: #003e69;
+  --ifm-color-primary-dark: #00385e;
+  --ifm-color-primary-darker: #003559;
+  --ifm-color-primary-darkest: #002b4a;
+  --ifm-color-primary-light: #004473;
+  --ifm-color-primary-lighter: #004779;
+  --ifm-color-primary-lightest: #005189;
+  --ifm-color-primary-body: #39464B;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-footer-link-hover-color: #7894C4;
+  
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-h1: #f7901e;
+  --ifm-color-primary: #f7901e;
+  --ifm-color-primary-dark: #f18309;
+  --ifm-color-primary-darker: #e37b08;
+  --ifm-color-primary-darkest: #bb6607;
+  --ifm-color-primary-light: #f89d39;
+  --ifm-color-primary-lighter: #f8a446;
+  --ifm-color-primary-lightest: #fab86e;
+  --ifm-color-primary-body: #00000;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-footer-link-hover-color: var(--ifm-color-primary);
+}
+
+body {
+  color: var(--ifm-color-primary-body);
+}
+
+h1 {
+  color: var(--ifm-color-h1);
+}
+
+h2 {
+  color: #f7901e;
+}
+
+h3 {
+  color: var(--ifm-color-h1);
+}
+
+h4{
+  color: var(--ifm-color-primary-lightest);
+  font-size: 15pt;
+}
+
+h5{
+  font-size: 13pt;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  empty-cells: hide;
+  overflow-x: auto;
+}
+
+a {
+  color: #4A90AD;
+  font-weight: 600;
+}
+
+
+.menu__link{
+  font-weight:100;
+}
+
+.menu__link--active{
+font-weight:600;
+
+}
+
+thead tr th:first-child,
+tbody tr td:first-child {
+  min-width: 10em;
+  max-width: fit-content;
+  word-break: keep-all;
+}
+
+th {
+  text-align: left;
+  height: min-content;
+}
+

@@ -1,0 +1,80 @@
+.categories {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.category-expanded {
+  flex-grow: 1;
+}
+
+.scope-category {
+  min-width: 0;
+  text-align: start;
+  font-size: 1rem;
+  background: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  box-shadow: 0 3px 6px 0 rgb(0 0 0 / 20%);
+  cursor: pointer;
+  transition: all 0.3s ease; /* Include other properties that might change */
+  height: 60px; /* Set a fixed height for collapsed categories */
+
+}
+
+.scope-category.expanded {
+  height: auto; /* Set height to auto when category is expanded */
+}
+
+.scope-category:hover:not(.expanded) {
+  border: 1px solid var(--ifm-color-primary); /* Change border only for non-expanded category on hover */
+}
+
+.chevron {
+  display: inline-block;
+  margin-left: 5px;
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.3s ease;
+}
+
+.scope-category .chevron.expanded {
+  transform: rotate(45deg);
+}
+
+.function-list {
+  list-style-type: disc;
+  overflow: hidden;
+  font-size: 0.9rem;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.function-list.show {
+  max-height: fit-content;
+}
+
+.function-item {
+  margin-top: 10px;
+  color: var(--ifm-color-emphasis-700);
+  white-space: nowrap;
+  overflow: auto;
+}
+
+.function-item:first-child {
+  margin-top: 20px;
+}
+
+.function-link {
+  color: #000;
+  text-decoration: none;
+}
+
+.function-link:hover {
+  text-decoration: underline;
+}

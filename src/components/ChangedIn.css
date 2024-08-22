@@ -1,0 +1,11 @@
+.changedIn {
+    width: max-content;
+    border-radius: 0.4rem;
+    display: inline;
+    padding: 0.4rem;
+    height: fit-content;
+    background-color: #8dd3fb;
+    font-weight: bold;
+    text-align: center;
+    color: #39464B;
+}
