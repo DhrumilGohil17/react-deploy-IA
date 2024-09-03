@@ -104,6 +104,7 @@ jobs:
 
           # Transfer source code to EC2
           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /tmp/react-app"
+          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react-app
           scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r ./* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react-app
 
           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
