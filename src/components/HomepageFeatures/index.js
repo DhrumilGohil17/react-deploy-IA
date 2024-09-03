@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'to Use',
     description: (
       <>
         Docusaurus was designed from the ground up to be easily installed and

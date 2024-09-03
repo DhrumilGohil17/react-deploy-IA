@@ -1,3 +1,65 @@
+# name: Deploy React App to EC2
+
+# on:
+#   push:
+#     branches:
+#       - main  # Adjust this if you want to deploy from a different branch
+
+# jobs:
+#   deploy:
+#     name: Deploy to EC2
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '18.x'  # Match the node version in your package.json
+
+#     - name: Install dependencies
+#       run: npm install
+
+#     - name: Build the React app
+#       run: npm run build
+
+#     - name: Upload build artifacts
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: build-artifact
+#         path: build/
+
+#     - name: Download build artifact
+#       uses: actions/download-artifact@v3
+#       with:
+#         name: build-artifact
+
+#     - name: Deploy to EC2
+#       env:
+#         EC2_HOST: ${{ secrets.EC2_HOST }}  # Add your EC2 public IP or domain as a secret in GitHub
+#         EC2_USER: ${{ secrets.EC2_USER }}  # Add your EC2 user (e.g., 'ec2-user') as a secret in GitHub
+#         EC2_KEY: ${{ secrets.EC2_KEY }}    # Add your private key for SSH as a secret in GitHub
+#       run: |
+#           echo "${{ secrets.EC2_KEY }}" > ~/ec2-key.pem
+#           chmod 600 ~/ec2-key.pem
+
+#           # Transfer build artifacts and SSH key to bastion host
+#           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir /tmp/react"
+#           scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react
+#           scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react
+
+#           # SSH into bastion host and transfer to private instance
+#           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+#             ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} "mkdir /tmp/react"
+#             scp -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem -r /tmp/react/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}:/tmp/react
+#             ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
+#               sudo cp -r /tmp/react/* /var/www/html/
+#               sudo systemctl restart nginx
+#             INNER_EOF
+#             rm -f /tmp/ec2-key.pem
+#           EOF
 name: Deploy React App to EC2
 
 on:
@@ -22,41 +84,40 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build the React app
-      run: npm run build
-
-    - name: Upload build artifacts
+    - name: Upload source code
       uses: actions/upload-artifact@v3
       with:
-        name: build-artifact
-        path: build/
+        name: source-code
+        path: ./
 
-    - name: Download build artifact
+    - name: Download source code
       uses: actions/download-artifact@v3
       with:
-        name: build-artifact
+        name: source-code
 
-    - name: Deploy to EC2
+    - name: Deploy to EC2 and start server
       env:
-        EC2_HOST: ${{ secrets.EC2_HOST }}  # Add your EC2 public IP or domain as a secret in GitHub
-        EC2_USER: ${{ secrets.EC2_USER }}  # Add your EC2 user (e.g., 'ec2-user') as a secret in GitHub
-        EC2_KEY: ${{ secrets.EC2_KEY }}    # Add your private key for SSH as a secret in GitHub
+        EC2_HOST: ${{ secrets.EC2_HOST }}  # Public IP or domain of your EC2 instance
+        EC2_USER: ${{ secrets.EC2_USER }}  # User to SSH into EC2 instance (e.g., 'ec2-user')
+        EC2_KEY: ${{ secrets.EC2_KEY }}    # SSH private key as a secret in GitHub
+        EC2_PVT_HOST: ${{ secrets.EC2_PVT_HOST }} # Private IP or hostname of the EC2 instance if behind a bastion
       run: |
           echo "${{ secrets.EC2_KEY }}" > ~/ec2-key.pem
           chmod 600 ~/ec2-key.pem
 
-          # Transfer build artifacts and SSH key to bastion host
-          ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir /tmp/react"
-          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react
-          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react
+          # Transfer source code to EC2
+          ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /tmp/react-app"
+          scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r ./* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react-app
 
-          # SSH into bastion host and transfer to private instance
           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} "mkdir /tmp/react"
             scp -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem -r /tmp/react/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}:/tmp/react
             ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
-              sudo cp -r /tmp/react/* /var/www/html/
-              sudo systemctl restart nginx
+            if pgrep -f "docusaurus serve"; then
+              pkill -f "docusaurus serve"
+            fi
+            cd /tmp/react-app
+            yarn install
+            yarn start &
             INNER_EOF
-            rm -f /tmp/ec2-key.pem
           EOF

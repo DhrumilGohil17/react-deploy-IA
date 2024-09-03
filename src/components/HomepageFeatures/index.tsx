@@ -26,7 +26,7 @@ const FeatureList: FeatureItem[] = [
     link: "https://inductiveuniversity.com/",
     description: (
       <>
-        Take our <a href="https://inductiveuniversity.com/">Inductive University courses</a> to earn your IU Credential or expand your knowledge through Elective Studies.
+        Take our <a href="https://inductiveuniversity.com/">Inductive University </a> to earn your IU Credential or expand your knowledge through Elective Studies.
       </>
     ),
   },
