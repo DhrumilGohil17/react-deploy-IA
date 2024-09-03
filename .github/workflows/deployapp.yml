@@ -118,6 +118,6 @@ jobs:
               cd /tmp/react-app
               sudo yarn install
               sudo yarn build
-              sudo yarn serve
+              sudo yarn serve & 
           INNER_EOF
           EOF
