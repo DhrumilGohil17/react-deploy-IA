@@ -81,9 +81,6 @@ jobs:
       with:
         node-version: '18.x'  # Match the node version in your package.json
 
-    - name: Install dependencies
-      run: npm install
-
     - name: Upload source code
       uses: actions/upload-artifact@v3
       with:
