@@ -107,14 +107,14 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ~/ec2-key.pem -r ./* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/react-app
 
           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} "mkdir -p  /tmp/react-app"
-            scp -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem -r /tmp/react/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}: /tmp/react-app
-            ssh -o StrictHostKeyChecking=no -i /tmp/react/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
+            ssh -o StrictHostKeyChecking=no -i /tmp/react-appec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} "mkdir -p  /tmp/react-app"
+            scp -o StrictHostKeyChecking=no -i /tmp/react-appec2-key.pem -r /tmp/react/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}: /tmp/react-app
+            ssh -o StrictHostKeyChecking=no -i /tmp/react-appec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
             if pgrep -f "docusaurus serve"; then
               pkill -f "docusaurus serve"
             fi
             cd /tmp/react-app
-            yarn install
-            yarn start &
+            sudo yarn install
+            sudo yarn start &
             INNER_EOF
           EOF
