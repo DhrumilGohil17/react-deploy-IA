@@ -109,7 +109,7 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i ~/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             # ssh -o StrictHostKeyChecking=no -i /tmp/react-app/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} "mkdir -p /tmp/react-app"
-            scp -v StrictHostKeyChecking=no -i /tmp/react-app/ec2-key.pem -r /tmp/react-app ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}:/tmp/react-app 2>&1 | tee /tmp/scp_error.log
+            scp -v -i /tmp/react-app/ec2-key.pem -r /tmp/react-app ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }}:/tmp/react-app 2>&1 | tee /tmp/scp_error.log
             ssh -o StrictHostKeyChecking=no -i /tmp/react-app/ec2-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_PVT_HOST }} << 'INNER_EOF'
             echo "Hello world"
             if pgrep -f "docusaurus serve"; then
@@ -119,5 +119,5 @@ jobs:
             sudo yarn install
             sudo yarn build
             sudo docusaurus serve
-            INNER_EOF
-          EOF
+          INNER_EOF
+        EOF
