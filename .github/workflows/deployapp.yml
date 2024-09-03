@@ -118,6 +118,6 @@ jobs:
               cd /tmp/react-app
               sudo yarn install
               sudo yarn build
-              sudo docusaurus serve
-            INNER_EOF
+              sudo yarn serve
+          INNER_EOF
           EOF
